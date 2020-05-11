@@ -1,0 +1,592 @@
+// Dota2 Editor
+// Get latest version: https://github.com/zombieJ/nw-dota2editor
+
+"DOTAAbilities"
+{
+	"Version"		"1"
+
+	// =================================================================================================================
+	// Templar Assassin: Refraction Holdout
+	// =================================================================================================================
+	"fireBlast"
+	{
+		"BaseClass"	"ability_lua"
+		"AbilityTextureName"	"ogre_magi_fireblast"
+		"ScriptFile"	"fireBlast"
+		// General
+		// -------------------------------------------------------------------------------------------------------------
+		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetType"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetTeam"	"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitDamageType"	"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"	"SPELL_IMMUNITY_ENEMIES_NO"
+		// Casting
+		// -------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"	"0.0 0.0 0.0 0.0"
+		// Time
+		// -------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"	"11 10 9 8"
+		// Cost
+		// -------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"	"75 85 95 105"
+		"AbilityCastRange"	"475"
+		"precache"
+		{
+			"particle"	"particles\generic_gameplay\generic_stunned.vpcf"
+			"particle"	"particles\econ\items\ogre_magi\ogre_magi_arcana\ogre_magi_arcana_fireblast.vpcf"
+			"particle"	"particles\econ\items\ogre_magi\ogre_magi_arcana\ogre_magi_arcana_fireblast_cast.vpcf"
+		}
+		"OnSpellStart"
+		{
+			"Damage"
+			{
+				"Target"	"TARGET"
+				"Type"	"DAMAGE_TYPE_MAGICAL"
+				"Damage"	"%spell_damage"
+			}
+			"ApplyModifier"
+			{
+				"Target"	"TARGET"
+				"ModifierName"	"modifier_data_driven"
+				"Duration"	"%stun_time"
+			}
+		}
+		"Modifiers"
+		{
+			"modifier_fireBlast"
+			{
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED"	"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+		// Special
+		// -------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"	"FIELD_INTEGER"
+				"spell_damage"	"60 120 180 240"
+			}
+			"02"
+			{
+				"var_type"	"FIELD_FLOAT"
+				"stun_time"	"1.5"
+			}
+		}
+		"AbilityDamage"	"60 120 180 240"
+	}
+
+	"幽冥轰爆"
+	{
+		"BaseClass"	"ability_datadriven"
+		"AbilityTextureName"	"skeleton_king_hellfire_blast"
+		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetType"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetTeam"	"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitDamageType"	"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"	"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityType"	"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityCastPoint"	"0.35"
+		"AbilityCastAnimation"	"ACT_DOTA_CAST_ABILITY_1"
+		"AbilityCooldown"	"%cookdown"
+		"AbilityManaCost"	"95 110 125 140"
+		"AbilityCastRange"	"525"
+		"precache"
+		{
+			"particle"	"particles\units\heroes\hero_sheletonking\skeletonking_hellfireblast.vpcf"
+			"soundfile"	"soundevents/game_sounds_heroes/game_sounds_skeletonking.vsndevts"
+			"particle"	"particles\units\heroes\hero_sheletonking\skeletonking_hellfireblast_explosion.vpcf"
+			"particle"	"particles\units\heroes\hero_sheletonking\skeletonking_hellfireblast_debuff.vpcf"
+		}
+		"OnSpellStart"
+		{
+			"TrackingProjectile"
+			{
+				"Target"	"TARGET"
+				"EffectName"	"particles\units\heroes\hero_sheletonking\skeletonking_hellfireblast.vpcf"
+				"Dodgeable"	"1"
+				"MoveSpeed"	"1000"
+				"SourceAttachment"	"DOTA_PROJECTILE_ATTACHMENT_ATTACK_1"
+			}
+			"FireSound"
+			{
+				"Target"	"CASTER"
+				"EffectName"	"Hero_SkeletonKing.Hellfire_Blast"
+			}
+		}
+		"OnProjectileHitUnit"
+		{
+			"FireSound"
+			{
+				"Target"	"CASTER"
+				"EffectName"	"Hero_SkeletonKing.Hellfire_BlastImpact.vpcf"
+			}
+			"Damage"
+			{
+				"Target"	"TARGET"
+				"Type"	"DAMAGE_TYPE_MAGICAL"
+				"Damage"	"100"
+			}
+			"ApplyModifier"
+			{
+				"Target"	"TARGET"
+				"ModifierName"	"modifler_skeleton_stun_speedslow"
+			}
+			"ApplyModifier"
+			{
+				"Target"	"TARGET"
+				"ModifierName"	"modifler_skeleton_stun"
+			}
+			"DelayedAction"
+			{
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"Target"	"TARGET"
+						"ModifierName"	"modifler_skeleton_stun_blast_dot"
+					}
+				}
+				"Delay"	"%stun_time"
+			}
+			"FireEffect"
+			{
+				"Target"	"TARGET"
+				"EffectName"	"particles\units\heroes\hero_sheletonking\skeletonking_hellfireblast_explosion.vpcf"
+				"EffectAttachType"	"follow_origin"
+			}
+		}
+		"Modifiers"
+		{
+			"modifler_skeleton_stun_speedslow"
+			{
+				"Duration"	"%slow_time"
+				"TextureName"	"skeleton_king_hellfire_blast"
+				"IsDebuff"	"1"
+				"EffectName"	"particles\units\heroes\hero_sheletonking\skeletonking_hellfireblast_debuff.vpcf"
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"-20"
+				}
+			}
+			"modifler_skeleton_stun"
+			{
+				"Duration"	"1.1 1.4 1.7 2"
+				"IsDebuff"	"1"
+				"EffectAttachType"	"follow_overhead"
+				"StatusEffectName"	"particles/generic_gameplay/generic_stunned.vpcf"
+				"OverrideAnimation"	"ACT_DOTA_DISABLED"
+				"Properties"	{}
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED"	"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+			"modifler_skeleton_stun_blast_dot"
+			{
+				"Duration"	"2"
+				"IsDebuff"	"1"
+				"IsHidden"	"1"
+				"OnIntervalThink"
+				{
+					"Damage"
+					{
+						"Target"	"TARGET"
+						"Type"	"DAMAGE_TYPE_MAGICAL"
+					}
+				}
+			}
+		}
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"	"FIELD_FLOAT"
+				"stun_time"	"1.1 1.4 1.7 2"
+			}
+			"02"
+			{
+				"var_type"	"FIELD_INTEGER"
+				"slow_time"	"3.1 3.4 3.7 4"
+			}
+			"03"
+			{
+				"var_type"	"FIELD_INTEGER"
+				"con_damage"	"10 30 50 70"
+			}
+			"04"
+			{
+				"var_type"	"FIELD_INTEGER"
+				"cookdown"	"14 12 10 8"
+			}
+		}
+	}
+
+	"firetest"
+	{
+		"BaseClass"	"ability_datadriven"
+		"AbilityTextureName"	"ogre_magi_fireblast"
+		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetType"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetTeam"	"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitDamageType"	"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"	"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityType"	"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityCooldown"	"11 10 9 8"
+		"AbilityManaCost"	"75 85 95 105"
+		"AbilityCastRange"	"475"
+		"precache"
+		{
+			"particle"	"particles\econ\items\ogre_magi\ogre_magi_arcana\ogre_magi_arcana_fireblast.vpcf"
+			"particle"	"particles\econ\items\ogre_magi\ogre_magi_arcana\ogre_magi_arcana_fireblast_cast.vpcf"
+			"particle"	"particles\generic_gameplay\generic_stunned.vpcf"
+		}
+		"OnSpellStart"
+		{
+			"RunScript"
+			{
+				"Target"	"TARGET"
+				"ScriptFile"	"fireBlast.lua"
+				"Function"	"damage"
+			}
+			"ApplyModifier"
+			{
+				"Target"	"TARGET"
+				"ModifierName"	"modifier_data_driven"
+				"Duration"	"%stun_time"
+			}
+			"FireEffect"
+			{
+				"Target"	"TARGET"
+				"EffectName"	"particles\econ\items\ogre_magi\ogre_magi_arcana\ogre_magi_arcana_fireblast.vpcf"
+				"EffectAttachType"	"follow_overhead"
+			}
+			"FireEffect"
+			{
+				"Target"	"TARGET"
+				"EffectName"	"particles\econ\items\ogre_magi\ogre_magi_arcana\ogre_magi_arcana_fireblast_cast.vpcf"
+				"EffectAttachType"	"follow_origin"
+			}
+			"FireSound"
+			{
+				"Target"	"CASTER"
+				"EffectName"	"ogm_arc_ability_firebl_01.vsnd"
+			}
+		}
+		"Modifiers"
+		{
+			"modifier_data_driven"
+			{
+				"IsDebuff"	"1"
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED"	"MODIFIER_STATE_VALUE_ENABLED"
+				}
+				"Duration"	"%shun_time"
+				"EffectName"	"particles\generic_gameplay\generic_stunned.vpcf"
+				"EffectAttachType"	"follow_overhead"
+				"OverrideAnimation"	"ACT_DOTA_DISABLED"
+			}
+		}
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"	"FIELD_INTEGER"
+				"spell_damage"	"60 120 180 240"
+			}
+			"02"
+			{
+				"var_type"	"FIELD_FLOAT"
+				"shun_time"	"1.5"
+			}
+		}
+	}
+
+	"vs_stun"
+	{
+		"BaseClass"	"ability_datadriven"
+		"AbilityTextureName"	"vengefulspirit_magic_missile"
+		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetType"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetTeam"	"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitDamageType"	"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"	"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityType"	"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityCastPoint"	"0.3"
+		"AbilityCooldown"	"9"
+		"AbilityManaCost"	"110 120 130 140"
+		"AbilityCastRange"	"500"
+		"precache"
+		{
+			"particle"	"particles\econ\items\vengeful\vs_ti8_immortal_shoulder\vs_ti8_immortal_magic_missle.vpcf"
+			"particle"	"particles\generic_gameplay\generic_stunned.vpcf"
+		}
+		"OnSpellStart"
+		{
+			"TrackingProjectile"
+			{
+				"Target"	"TARGET"
+				"Dodgeable"	"1"
+				"EffectName"	"particles\econ\items\vengeful\vs_ti8_immortal_shoulder\vs_ti8_immortal_magic_missle.vpcf"
+				"MoveSpeed"	"900"
+				"SourceAttachment"	"DOTA_PROJECTILE_ATTACHMENT_ATTACK_1"
+			}
+		}
+		"OnProjectileHitUnit"
+		{
+			"DeleteOnHit"	"1"
+			"ApplyModifier"
+			{
+				"Target"	"TARGET"
+				"ModifierName"	"modifier_vs_stun"
+				"Duration"	"%stun_time"
+			}
+			"ApplyModifier"
+			{
+				"Target"
+				{
+					"Types"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+					"Teams"	"DOTA_UNIT_TARGET_TEAM_ENEMY"
+					"Center"	"TARGET"
+					"Radius"	"600"
+				}
+				"ModifierName"	"modifier_vs_stun_continuous_damage"
+				"Duration"	"10"
+			}
+		}
+		"Modifiers"
+		{
+			"modifier_vs_stun"
+			{
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED"	"MODIFIER_STATE_VALUE_ENABLED"
+				}
+				"IsDebuff"	"1"
+				"TextureName"	"vengefulspirit_magic_missile"
+				"EffectName"	"particles\generic_gameplay\generic_stunned.vpcf"
+				"EffectAttachType"	"follow_overhead"
+				"Properties"	{}
+				"ThinkInterval"	"1"
+			}
+			"modifier_vs_stun_continuous_damage"
+			{
+				"TextureName"	"vengefulspirit_magic_missile"
+				"States"	{}
+				"IsDebuff"	"1"
+				"OnIntervalThink"
+				{
+					"Damage"
+					{
+						"Target"	"TARGET"
+						"Type"	"DAMAGE_TYPE_MAGICAL"
+						"Damage"	"10"
+					}
+				}
+				"ThinkInterval"	"1"
+			}
+		}
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"	"FIELD_INTEGER"
+				"spell_damage"	"100 200 300 400"
+			}
+			"02"
+			{
+				"var_type"	"FIELD_FLOAT"
+				"stun_time"	"1.5"
+			}
+		}
+	}
+
+	"vs_stun_clone"
+	{
+		"BaseClass"	"ability_datadriven"
+		"AbilityTextureName"	"vengefulspirit_magic_missile"
+		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetType"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetTeam"	"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitDamageType"	"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"	"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityType"	"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityCastPoint"	"0.3"
+		"AbilityCooldown"	"9"
+		"AbilityManaCost"	"110 120 130 140"
+		"AbilityCastRange"	"500"
+		"precache"
+		{
+			"particle"	"particles\econ\items\vengeful\vs_ti8_immortal_shoulder\vs_ti8_immortal_magic_missle.vpcf"
+		}
+		"OnSpellStart"
+		{
+			"TrackingProjectile"
+			{
+				"Target"	"TARGET"
+				"Dodgeable"	"1"
+				"EffectName"	"particles\econ\items\vengeful\vs_ti8_immortal_shoulder\vs_ti8_immortal_magic_missle.vpcf"
+				"MoveSpeed"	"900"
+				"SourceAttachment"	"DOTA_PROJECTILE_ATTACHMENT_ATTACK_1"
+			}
+		}
+		"OnProjectileHitUnit"
+		{
+			"DeleteOnHit"	"1"
+			"RunScript"
+			{
+				"Target"	"TARGET"
+				"ScriptFile"	"vs_stun_clone"
+				"Function"	"lighting"
+			}
+		}
+	}
+
+	"vs_stun_value"
+	{
+		"BaseClass"	"ability_lua"
+		"AbilityTextureName"	"vengefulspirit_magic_missile"
+		"ScriptFile"	"vs_stun_value"
+		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetType"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetTeam"	"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitDamageType"	"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"	"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityType"	"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityCastPoint"	"0.3"
+		"AbilityCooldown"	"9"
+		"AbilityManaCost"	"110 120 130 140"
+		"AbilityCastRange"	"500"
+		"precache"
+		{
+			"particle"	"particles\econ\items\vengeful\vs_ti8_immortal_shoulder\vs_ti8_immortal_magic_missle.vpcf"
+			"particle"	"particles\generic_gameplay\generic_stunned.vpcf"
+		}
+		"OnProjectileHitUnit"
+		{
+			"Damage"
+			{
+				"Target"	"TARGET"
+				"Type"	"DAMAGE_TYPE_MAGICAL"
+				"Damage"	"%spell_damage"
+			}
+			"ApplyModifier"
+			{
+				"Target"	"TARGET"
+				"ModifierName"	"vs_stun_value"
+			}
+		}
+		"Modifiers"
+		{
+			"modifier_vs_stun_value"
+			{
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED"	"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"	"FIELD_FLOAT"
+				"stun_time"	"1.5 1.5 1.5 1.5"
+			}
+			"02"
+			{
+				"var_type"	"FIELD_INTEGER"
+				"spell_damage"	"100 200 300 400"
+			}
+			"03"
+			{
+				"var_type"	"FIELD_INTEGER"
+				"continous_damage"	"10"
+			}
+		}
+	}
+
+	"vs_stun_lua"
+	{
+		"BaseClass"	"ability_lua"
+		"AbilityTextureName"	"vengefulspirit_magic_missile"
+		"ScriptFile"	"vs_stun_lua"
+		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetType"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetTeam"	"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitDamageType"	"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"	"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityType"	"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityCastPoint"	"0.3"
+		"AbilityCooldown"	"9"
+		"AbilityManaCost"	"110 120 130 140"
+		"AbilityCastRange"	"500"
+		"precache"
+		{
+			"particle"	"particles\econ\items\vengeful\vs_ti8_immortal_shoulder\vs_ti8_immortal_magic_missle.vpcf"
+			"particle"	"particles\generic_gameplay\generic_stunned.vpcf"
+		}
+		"OnProjectileHitUnit"
+		{
+			"Damage"
+			{
+				"Target"	"TARGET"
+				"Type"	"DAMAGE_TYPE_MAGICAL"
+				"Damage"	"%spell_damage"
+			}
+			"ApplyModifier"
+			{
+				"Target"	"TARGET"
+				"ModifierName"	"vs_stun_value"
+			}
+		}
+		"Modifiers"
+		{
+			"modifier_vs_stun_value"
+			{
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED"	"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"	"FIELD_FLOAT"
+				"stun_time"	"1.5 1.5 1.5 1.5"
+			}
+			"02"
+			{
+				"var_type"	"FIELD_INTEGER"
+				"spell_damage"	"100 200 300 400"
+			}
+			"03"
+			{
+				"var_type"	"FIELD_INTEGER"
+				"continous_damage"	"10"
+			}
+		}
+	}
+
+	"bomb_lua"
+	{
+		"BaseClass"	"ability_lua"
+		"AbilityTextureName"	"skeleton_king_hellfire_blast"
+		"ScriptFile"	"bomb_lua.lua"
+		"AbilityBehavior"	"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetType"	"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetTeam"	"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitDamageType"	"DAMAGE_TYPE_MAGICAL"
+		"SpellImmunityType"	"SPELL_IMMUNITY_ENEMIES_NO"
+		"AbilityCastPoint"	"0.35"
+		"AbilityCooldown"	"8"
+		"AbilityManaCost"	"120"
+		"AbilityCastRange"	"999999999"
+	}
+}
