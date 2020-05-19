@@ -1,10 +1,12 @@
+require("spawn")
+
 -- Generated from template
 
 if CAddonTemplateGameMode == nil then
 	CAddonTemplateGameMode = class({})
 end
 
-function Precache( context )
+function Precache(context)
 	--[[
 		Precache things we know we'll use.  Possible file types include (but not limited to):
 			PrecacheResource( "model", "*.vmdl", context )
@@ -12,7 +14,6 @@ function Precache( context )
 			PrecacheResource( "particle", "*.vpcf", context )
 			PrecacheResource( "particle_folder", "particles/folder", context )
 	]]
-	PrecacheResource("soundfile", "fireblast_cast.vpcf", context)
 end
 
 -- Create the game mode when we activate
@@ -22,14 +23,20 @@ function Activate()
 end
 
 function CAddonTemplateGameMode:InitGameMode()
-	print( "Template addon is loaded." )
-	GameRules:GetGameModeEntity():SetThink( "OnThink", self, "GlobalThink", 2 )
+	-- 修改2：把备战时间调短
+	GameRules:SetPreGameTime(5)
+
+	-- 修改3：创建并启动刷怪器
+	self.mob_spawner = MobSpawner()
+	self.mob_spawner:Start()
+	print("Template addon is loaded.")
+	GameRules:GetGameModeEntity():SetThink("OnThink", self, "GlobalThink", 2)
 end
 
 -- Evaluate the state of the game
 function CAddonTemplateGameMode:OnThink()
 	if GameRules:State_Get() == DOTA_GAMERULES_STATE_GAME_IN_PROGRESS then
-		--print( "Template addon script is running." )
+		-- print("Template addon script is running.")
 	elseif GameRules:State_Get() >= DOTA_GAMERULES_STATE_POST_GAME then
 		return nil
 	end
